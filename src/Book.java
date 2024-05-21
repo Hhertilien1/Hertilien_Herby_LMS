@@ -9,8 +9,6 @@
 * Each Book object encapsulates the details of one book.
 */
 
-
-
 public class Book {
 
     private int id;
