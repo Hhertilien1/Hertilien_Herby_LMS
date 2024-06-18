@@ -10,12 +10,9 @@
  * It handles operations related to maintaining the list of books, ensuring no duplicate IDs, and interacting with external data sources (files).
  */
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class LibraryManager {
     private List<Book> books;
@@ -24,98 +21,44 @@ public class LibraryManager {
         this.books = new ArrayList<>();
     }
 
-    /**
-     * Adds books from a text file to the library.
-     * @param filePath the path to the text file containing book data.
-     */
-    public void addBookFromFile(String filePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                int id = Integer.parseInt(parts[0].trim());
-                String title = parts[1].trim();
-                String author = parts[2].trim();
-                Book book = new Book(id, title, author);
-                if (!isBookIdDuplicate(id)) {
-                    books.add(book);
-                    System.out.println("Book added successfully.");
-                } else {
-                    System.out.println("Book with ID " + id + " already exists. Skipped.");
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+    public void addBook(Book book) {
+        if (!isBookIdDuplicate(book.getId())) {
+            books.add(book);
         }
     }
 
-    /**
-     * Removes a book from the library by its ID.
-     * @param id the ID of the book to be removed.
-     */
     public void removeBookById(int id) {
         books.removeIf(book -> book.getId() == id);
-        System.out.println("Book removed successfully.");
     }
 
-    /**
-     * Removes a book from the library by its title.
-     * @param title the title of the book to be removed.
-     */
     public void removeBookByTitle(String title) {
         books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
-        System.out.println("Book removed successfully.");
     }
 
-    /**
-     * Lists all books in the library.
-     */
-    public void listAllBooks() {
-        if (books.isEmpty()) {
-            System.out.println("No books in the collection.");
-            return;
-        }
-        System.out.println("Books in the collection:");
-        for (Book book : books) {
-            System.out.println(book);
-        }
+    public List<Book> listAllBooks() {
+        return new ArrayList<>(books);
     }
 
-    /**
-     * Checks out a book by its title.
-     * @param title the title of the book to be checked out.
-     */
     public void checkOutBook(String title) {
         for (Book book : books) {
             if (book.getTitle().equalsIgnoreCase(title) && book.isAvailable()) {
                 book.setAvailable(false);
-                System.out.println("Book checked out successfully.");
+                book.setDueDate(LocalDate.now().plusWeeks(2)); // Example due date: 2 weeks from now
                 return;
             }
         }
-        System.out.println("Book not available for checkout.");
     }
 
-    /**
-     * Checks in a book by its title.
-     * @param title the title of the book to be checked in.
-     */
     public void checkInBook(String title) {
         for (Book book : books) {
             if (book.getTitle().equalsIgnoreCase(title) && !book.isAvailable()) {
                 book.setAvailable(true);
-                System.out.println("Book checked in successfully.");
+                book.setDueDate(null);
                 return;
             }
         }
-        System.out.println("Book not found or already checked in.");
     }
 
-    /**
-     * Checks if a book ID is duplicate.
-     * @param id the ID of the book to check.
-     * @return true if the book ID is duplicate, false otherwise.
-     */
     private boolean isBookIdDuplicate(int id) {
         for (Book book : books) {
             if (book.getId() == id) {
@@ -123,5 +66,8 @@ public class LibraryManager {
             }
         }
         return false;
+    }
+
+    public void addBookFromFile(String fileName) {
     }
 }
