@@ -26,6 +26,7 @@ public class Book {
         this.dueDate = null;
     }
 
+
     // Getters and setters
     public int getId() { return id; }
     public String getTitle() { return title; }

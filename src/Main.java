@@ -10,53 +10,88 @@
 * It initializes the LibraryManager and uses it to perform operations based on user input.
 * This class orchestrates the flow of the program by responding to user commands and invoking appropriate methods in the LibraryManager.
 */
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
-        LibraryManager libraryManager = new LibraryManager();
-        Scanner scanner = new Scanner(System.in);
+    private static LibraryManager libraryManager = new LibraryManager();
+    private static Scanner scanner = new Scanner(System.in);
 
-        // Ask the user for a file name and add books to the LMS database
-        System.out.println("Enter the file name to load books:");
+    public static void main(String[] args) {
+        boolean exit = false;
+        while (!exit) {
+            printMenu();
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character after nextInt()
+
+            switch (choice) {
+                case 1:
+                    addBookFromFile();
+                    break;
+                case 2:
+                    removeBook();
+                    break;
+                case 3:
+                    checkOutBook();
+                    break;
+                case 4:
+                    checkInBook();
+                    break;
+                case 5:
+                    listAllBooks();
+                    break;
+                case 6:
+                    exit = true;
+                    System.out.println("Exiting the program.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        scanner.close();
+    }
+
+    private static void printMenu() {
+        System.out.println("\nMenu:");
+        System.out.println("1. Add books from file");
+        System.out.println("2. Remove a book");
+        System.out.println("3. Check out a book");
+        System.out.println("4. Check in a book");
+        System.out.println("5. List all books");
+        System.out.println("6. Exit");
+        System.out.print("Enter your choice: ");
+    }
+
+    private static void addBookFromFile() {
+        System.out.print("Enter the file name: ");
         String fileName = scanner.nextLine();
         libraryManager.addBookFromFile(fileName);
+    }
 
-        // Print the database
-        System.out.println("Current books in the database:");
-        libraryManager.listAllBooks();
+    private static void removeBook() {
+        System.out.print("Enter the book title or ID to remove: ");
+        String input = scanner.nextLine();
+        try {
+            int bookId = Integer.parseInt(input);
+            libraryManager.removeBookById(bookId);
+        } catch (NumberFormatException e) {
+            libraryManager.removeBookByTitle(input);
+        }
+    }
 
-        // Remove a book by barcode (ID)
-        System.out.println("Enter the ID of the book to remove:");
-        int id = scanner.nextInt();
-        scanner.nextLine(); // consume newline
-        libraryManager.removeBookById(id);
-        System.out.println("Book removed. Current books in the database:");
-        libraryManager.listAllBooks();
+    private static void checkOutBook() {
+        System.out.print("Enter the book title to check out: ");
+        String checkOutTitle = scanner.nextLine();
+        libraryManager.checkOutBook(checkOutTitle);
+    }
 
-        // Remove a book by title
-        System.out.println("Enter the title of the book to remove:");
-        String title = scanner.nextLine();
-        libraryManager.removeBookByTitle(title);
-        System.out.println("Book removed. Current books in the database:");
-        libraryManager.listAllBooks();
+    private static void checkInBook() {
+        System.out.print("Enter the book title to check in: ");
+        String checkInTitle = scanner.nextLine();
+        libraryManager.checkInBook(checkInTitle);
+    }
 
-        // Check out a book by title
-        System.out.println("Enter the title of the book to check out:");
-        title = scanner.nextLine();
-        libraryManager.checkOutBook(title);
-        System.out.println("Book checked out. Current books in the database:");
-        libraryManager.listAllBooks();
-
-        // Check in a book by title
-        System.out.println("Enter the title of the book to check in:");
-        title = scanner.nextLine();
-        libraryManager.checkInBook(title);
-        System.out.println("Book checked in. Current books in the database:");
+    private static void listAllBooks() {
         libraryManager.listAllBooks();
     }
 }
