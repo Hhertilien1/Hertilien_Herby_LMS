@@ -20,7 +20,9 @@ public class LibraryManagementSystem {
     }
 
     private void initUI() {
-        JPanel panel = new JPanel(new GridLayout(7, 2));
+        JPanel panel = new JPanel(new GridLayout(7, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(new Color(0xF0F0F0));
 
         JLabel labelFile = new JLabel("File Path:");
         JTextField textFieldFile = new JTextField();
@@ -45,8 +47,34 @@ public class LibraryManagementSystem {
         JButton buttonListBooks = new JButton("List All Books");
         textAreaBooks = new JTextArea();
         JScrollPane scrollPaneBooks = new JScrollPane(textAreaBooks);
+        textAreaBooks.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        textAreaBooks.setBackground(new Color(0xFAFAFA));
+        textAreaBooks.setEditable(false);
 
         JButton buttonExit = new JButton("Exit");
+
+        // Set button colors
+        buttonAddBooks.setBackground(new Color(0x4CAF50));
+        buttonAddBooks.setForeground(Color.WHITE);
+        buttonRemoveBookByBarcode.setBackground(new Color(0xF44336));
+        buttonRemoveBookByBarcode.setForeground(Color.WHITE);
+        buttonRemoveBookByTitle.setBackground(new Color(0xF44336));
+        buttonRemoveBookByTitle.setForeground(Color.WHITE);
+        buttonCheckOutBook.setBackground(new Color(0x2196F3));
+        buttonCheckOutBook.setForeground(Color.WHITE);
+        buttonCheckInBook.setBackground(new Color(0x2196F3));
+        buttonCheckInBook.setForeground(Color.WHITE);
+        buttonListBooks.setBackground(new Color(0xFF9800));
+        buttonListBooks.setForeground(Color.WHITE);
+        buttonExit.setBackground(new Color(0x9E9E9E));
+        buttonExit.setForeground(Color.WHITE);
+
+        // Set label fonts
+        labelFile.setFont(new Font("Arial", Font.BOLD, 14));
+        labelBarcode.setFont(new Font("Arial", Font.BOLD, 14));
+        labelTitleRemove.setFont(new Font("Arial", Font.BOLD, 14));
+        labelTitleCheckOut.setFont(new Font("Arial", Font.BOLD, 14));
+        labelTitleCheckIn.setFont(new Font("Arial", Font.BOLD, 14));
 
         panel.add(labelFile);
         panel.add(textFieldFile);
@@ -78,11 +106,15 @@ public class LibraryManagementSystem {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String filePath = textFieldFile.getText();
-                try {
-                    libraryManager.addBookFromFile(filePath);
-                    JOptionPane.showMessageDialog(frame, "Books added from file.", "Success", JOptionPane.INFORMATION_MESSAGE);
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(frame, "Error reading file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                boolean success = libraryManager.addBookFromFile(filePath);
+                if (success) {
+                    JOptionPane.showMessageDialog(frame, "Books added from file successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    if (libraryManager.isFileAlreadyProcessed(filePath)) {
+                        JOptionPane.showMessageDialog(frame, "Books from this file have already been added.", "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "No books were added. Please check the file and try again.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
         });
@@ -94,7 +126,7 @@ public class LibraryManagementSystem {
                     int barcode = Integer.parseInt(textFieldBarcode.getText());
                     boolean result = libraryManager.removeBookById(barcode);
                     if (result) {
-                        JOptionPane.showMessageDialog(frame, "Book removed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(frame, "Book removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(frame, "Book with barcode '" + barcode + "' not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -110,7 +142,7 @@ public class LibraryManagementSystem {
                 String title = textFieldTitleRemove.getText();
                 boolean result = libraryManager.removeBookByTitle(title);
                 if (result) {
-                    JOptionPane.showMessageDialog(frame, "Book removed.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Book removed successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Book with title '" + title + "' not found.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -123,9 +155,9 @@ public class LibraryManagementSystem {
                 String title = textFieldTitleCheckOut.getText();
                 boolean result = libraryManager.checkOutBook(title);
                 if (result) {
-                    JOptionPane.showMessageDialog(frame, "Book checked out.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Book checked out successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Book with title '" + title + "' is not available or not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Book with title '" + title + "' not available for checkout.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -136,13 +168,12 @@ public class LibraryManagementSystem {
                 String title = textFieldTitleCheckIn.getText();
                 boolean result = libraryManager.checkInBook(title);
                 if (result) {
-                    JOptionPane.showMessageDialog(frame, "Book checked in.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Book checked in successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Book with title '" + title + "' is not checked out or not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(frame, "Book with title '" + title + "' not found or already checked in.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-
 
         buttonListBooks.addActionListener(new ActionListener() {
             @Override
@@ -158,7 +189,6 @@ public class LibraryManagementSystem {
                 }
             }
         });
-
 
         buttonExit.addActionListener(new ActionListener() {
             @Override

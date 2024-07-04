@@ -13,34 +13,46 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class LibraryManager {
     private List<Book> books;
+    private Set<String> processedFiles;
 
     public LibraryManager() {
         this.books = new ArrayList<>();
+        this.processedFiles = new HashSet<>();
     }
 
-    public void addBookFromFile(String filePath) {
-        try (BufferedReader br = new BufferedReader(new FileReader(String.valueOf(filePath)))) {
+    public boolean addBookFromFile(String filePath) {
+        if (processedFiles.contains(filePath)) {
+            return false;
+        }
+
+        boolean added = false;
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
+                if (parts.length < 3) continue; // Skip invalid lines
                 int id = Integer.parseInt(parts[0].trim());
                 String title = parts[1].trim();
                 String author = parts[2].trim();
                 Book book = new Book(id, title, author);
                 if (!isBookIdDuplicate(id)) {
                     books.add(book);
-                    System.out.println("Book added successfully.");
-                } else {
-                    System.out.println("Book with ID " + id + " already exists. Skipped.");
+                    added = true;
                 }
+            }
+            if (added) {
+                processedFiles.add(filePath);
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
+        return added;
     }
 
     public boolean removeBookById(int id) {
@@ -52,14 +64,6 @@ public class LibraryManager {
     }
 
     public List<Book> listAllBooks() {
-        if (books.isEmpty()) {
-            System.out.println("No books in the collection.");
-            return new ArrayList<>();
-        }
-        System.out.println("Books in the collection:");
-        for (Book book : books) {
-            System.out.println(book);
-        }
         return books;
     }
 
@@ -91,5 +95,8 @@ public class LibraryManager {
         }
         return false;
     }
-}
 
+    public boolean isFileAlreadyProcessed(String filePath) {
+        return processedFiles.contains(filePath);
+    }
+}
