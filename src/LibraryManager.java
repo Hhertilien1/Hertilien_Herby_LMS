@@ -14,7 +14,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class LibraryManager {
     private List<Book> books;
@@ -44,48 +43,44 @@ public class LibraryManager {
         }
     }
 
-    public void removeBookById(int id) {
-        books.removeIf(book -> book.getId() == id);
-        System.out.println("Book removed successfully.");
+    public boolean removeBookById(int id) {
+        return books.removeIf(book -> book.getId() == id);
     }
 
-    public void removeBookByTitle(String title) {
-        books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
-        System.out.println("Book removed successfully.");
+    public boolean removeBookByTitle(String title) {
+        return books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
     }
 
     public List<Book> listAllBooks() {
         if (books.isEmpty()) {
             System.out.println("No books in the collection.");
-            return null;
+            return new ArrayList<>();
         }
         System.out.println("Books in the collection:");
         for (Book book : books) {
             System.out.println(book);
         }
-        return null;
+        return books;
     }
 
-    public void checkOutBook(String title) {
+    public boolean checkOutBook(String title) {
         for (Book book : books) {
             if (book.getTitle().equalsIgnoreCase(title) && book.isAvailable()) {
                 book.setAvailable(false);
-                System.out.println("Book checked out successfully.");
-                return;
+                return true;
             }
         }
-        System.out.println("Book not available for checkout.");
+        return false;
     }
 
-    public void checkInBook(String title) {
+    public boolean checkInBook(String title) {
         for (Book book : books) {
             if (book.getTitle().equalsIgnoreCase(title) && !book.isAvailable()) {
                 book.setAvailable(true);
-                System.out.println("Book checked in successfully.");
-                return;
+                return true;
             }
         }
-        System.out.println("Book not found or already checked in.");
+        return false;
     }
 
     private boolean isBookIdDuplicate(int id) {
@@ -97,3 +92,4 @@ public class LibraryManager {
         return false;
     }
 }
+
