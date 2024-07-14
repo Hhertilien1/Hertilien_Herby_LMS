@@ -9,94 +9,183 @@
  * Relation to Overall Program: Acts as the main component for managing the library's book collection.
  * It handles operations related to maintaining the list of books, ensuring no duplicate IDs, and interacting with external data sources (files).
  */
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Random;
 
 public class LibraryManager {
     private List<Book> books;
-    private Set<String> processedFiles;
 
+    // Constructor
     public LibraryManager() {
-        this.books = new ArrayList<>();
-        this.processedFiles = new HashSet<>();
+        books = new ArrayList<>();
+        Random random = new Random();
     }
 
+    // Method to add books from a file
     public boolean addBookFromFile(String filePath) {
-        if (processedFiles.contains(filePath)) {
-            return false;
-        }
-
-        boolean added = false;
+        boolean addedAtLeastOneBook = false;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length < 3) continue; // Skip invalid lines
-                int id = Integer.parseInt(parts[0].trim());
-                String title = parts[1].trim();
-                String author = parts[2].trim();
-                Book book = new Book(id, title, author);
-                if (!isBookIdDuplicate(id)) {
+                String[] bookInfo = line.split(",");
+                if (bookInfo.length >= 2) {
+                    String title = bookInfo[0].trim();
+                    String author = bookInfo[1].trim();
+                    Book book = new Book(title, author);
                     books.add(book);
-                    added = true;
+                    addedAtLeastOneBook = true;
                 }
-            }
-            if (added) {
-                processedFiles.add(filePath);
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
         }
-        return added;
+        return addedAtLeastOneBook;
     }
 
-    public boolean removeBookById(int id) {
-        return books.removeIf(book -> book.getId() == id);
+    // Method to remove a book by its barcode
+    public boolean removeBookByBarcode(int barcode) {
+        Iterator<Book> iterator = books.iterator();
+        while (iterator.hasNext()) {
+            Book book = iterator.next();
+            if (book.getBarcode() == barcode) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
+    // Method to remove a book by its title
     public boolean removeBookByTitle(String title) {
-        return books.removeIf(book -> book.getTitle().equalsIgnoreCase(title));
+        Iterator<Book> iterator = books.iterator();
+        while (iterator.hasNext()) {
+            Book book = iterator.next();
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
     }
 
+    // Method to remove a book by its ID
+    public boolean removeBookById(int bookId) {
+        Iterator<Book> iterator = books.iterator();
+        while (iterator.hasNext()) {
+            Book book = iterator.next();
+            if (book.getBookId() == bookId) {
+                iterator.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Method to check out a book by its title
+    public boolean checkOutBookByTitle(String title) {
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                if (book.isAvailable()) {
+                    book.setAvailable(false);
+                    book.setDueDate(LocalDate.now().plusDays(14)); // Example: Due date set to 14 days from now
+                    return true;
+                } else {
+                    return false; // Book is already checked out
+                }
+            }
+        }
+        return false; // Book not found
+    }
+
+    // Method to check out a book by its ID
+    public boolean checkOutBookById(int bookId) {
+        for (Book book : books) {
+            if (book.getBookId() == bookId) {
+                if (book.isAvailable()) {
+                    book.setAvailable(false);
+                    book.setDueDate(LocalDate.now().plusDays(14)); // Example: Due date set to 14 days from now
+                    return true;
+                } else {
+                    return false; // Book is already checked out
+                }
+            }
+        }
+        return false; // Book not found
+    }
+
+    // Method to check out a book by its barcode
+    public boolean checkOutBookByBarcode(int barcode) {
+        for (Book book : books) {
+            if (book.getBarcode() == barcode) {
+                if (book.isAvailable()) {
+                    book.setAvailable(false);
+                    book.setDueDate(LocalDate.now().plusDays(14)); // Example: Due date set to 14 days from now
+                    return true;
+                } else {
+                    return false; // Book is already checked out
+                }
+            }
+        }
+        return false; // Book not found
+    }
+
+    // Method to check in a book by its title
+    public boolean checkInBookByTitle(String title) {
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                if (!book.isAvailable()) {
+                    book.setAvailable(true);
+                    book.setDueDate(null); // Clear due date upon check-in
+                    return true;
+                } else {
+                    return false; // Book is already available
+                }
+            }
+        }
+        return false; // Book not found
+    }
+
+    // Method to check in a book by its ID
+    public boolean checkInBookById(int bookId) {
+        for (Book book : books) {
+            if (book.getBookId() == bookId) {
+                if (!book.isAvailable()) {
+                    book.setAvailable(true);
+                    book.setDueDate(null); // Clear due date upon check-in
+                    return true;
+                } else {
+                    return false; // Book is already available
+                }
+            }
+        }
+        return false; // Book not found
+    }
+
+    // Method to check in a book by its barcode
+    public boolean checkInBookByBarcode(int barcode) {
+        for (Book book : books) {
+            if (book.getBarcode() == barcode) {
+                if (!book.isAvailable()) {
+                    book.setAvailable(true);
+                    book.setDueDate(null); // Clear due date upon check-in
+                    return true;
+                } else {
+                    return false; // Book is already available
+                }
+            }
+        }
+        return false; // Book not found
+    }
+
+    // Method to list all books in the library
     public List<Book> listAllBooks() {
         return books;
-    }
-
-    public boolean checkOutBook(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title) && book.isAvailable()) {
-                book.setAvailable(false);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean checkInBook(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title) && !book.isAvailable()) {
-                book.setAvailable(true);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean isBookIdDuplicate(int id) {
-        for (Book book : books) {
-            if (book.getId() == id) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isFileAlreadyProcessed(String filePath) {
-        return processedFiles.contains(filePath);
     }
 }
