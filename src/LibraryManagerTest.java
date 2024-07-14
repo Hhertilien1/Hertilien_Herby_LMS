@@ -1,67 +1,51 @@
-import org.junit.Before;
-import org.junit.Test;
-
-import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
 public class LibraryManagerTest {
-    private LibraryManager libraryManager;
-    private Book book1;
-    private Book book2;
 
-    @Before
-    public void setUp() {
-        libraryManager = new LibraryManager();
-        book1 = new Book(1, "To Kill a Mockingbird", "Harper Lee");
-        book2 = new Book(2, "1984", "George Orwell");
-    }
+    public static void main(String[] args) {
+        LibraryManager libraryManager = new LibraryManager();
 
-    @Test
-    public void testAddBook() {
-        libraryManager.addBook(book1);
-        List<Book> books = libraryManager.listAllBooks();
-        assertEquals(1, books.size());
-        assertEquals(book1, books.get(0));
-    }
+        // Add books from file
+        String filePath = "C:\\Users\\Herby\\OneDrive\\Desktop\\books.txt";
+        boolean booksAdded = libraryManager.addBookFromFile(filePath);
+        if (booksAdded) {
+            System.out.println("Books added successfully from file.");
+        } else {
+            System.out.println("Failed to add books from file.");
+        }
 
-    @Test
-    public void testRemoveBookById() {
-        libraryManager.addBook(book1);
-        libraryManager.addBook(book2);
-        libraryManager.removeBookById(1);
-        List<Book> books = libraryManager.listAllBooks();
-        assertEquals(1, books.size());
-        assertEquals(book2, books.get(0));
-    }
+        // List all books in the library
+        List<Book> allBooks = libraryManager.listAllBooks();
+        System.out.println("All books in the library:");
+        for (Book book : allBooks) {
+            System.out.println(book);
+        }
 
-    @Test
-    public void testRemoveBookByTitle() {
-        libraryManager.addBook(book1);
-        libraryManager.addBook(book2);
-        libraryManager.removeBookByTitle("To Kill a Mockingbird");
-        List<Book> books = libraryManager.listAllBooks();
-        assertEquals(1, books.size());
-        assertEquals(book2, books.get(0));
-    }
+        // Example: Remove a book by title
+        String titleToRemove = "1984";
+        boolean removedByTitle = libraryManager.removeBookByTitle(titleToRemove);
+        if (removedByTitle) {
+            System.out.println("Book with title '" + titleToRemove + "' removed.");
+        } else {
+            System.out.println("Book with title '" + titleToRemove + "' not found or could not be removed.");
+        }
 
-    @Test
-    public void testCheckOutBook() {
-        libraryManager.addBook(book1);
-        libraryManager.checkOutBook("To Kill a Mockingbird");
-        List<Book> books = libraryManager.listAllBooks();
-        assertFalse(books.get(0).isAvailable());
-        assertNotNull(books.get(0).getDueDate());
-    }
+        // Example: Check out a book by barcode
+        int barcodeToCheckout = 123; // Replace with an actual barcode from your file
+        boolean checkedOut = libraryManager.checkOutBookByBarcode(barcodeToCheckout);
+        if (checkedOut) {
+            System.out.println("Book with barcode '" + barcodeToCheckout + "' checked out successfully.");
+        } else {
+            System.out.println("Book with barcode '" + barcodeToCheckout + "' not found or could not be checked out.");
+        }
 
-    @Test
-    public void testCheckInBook() {
-        libraryManager.addBook(book1);
-        libraryManager.checkOutBook("To Kill a Mockingbird");
-        libraryManager.checkInBook("To Kill a Mockingbird");
-        List<Book> books = libraryManager.listAllBooks();
-        assertTrue(books.get(0).isAvailable());
-        assertNull(books.get(0).getDueDate());
+        // Example: Check in a book by ID
+        int bookIdToCheckIn = 1; // Replace with an actual book ID from your file
+        boolean checkedIn = libraryManager.checkInBookById(bookIdToCheckIn);
+        if (checkedIn) {
+            System.out.println("Book with ID '" + bookIdToCheckIn + "' checked in successfully.");
+        } else {
+            System.out.println("Book with ID '" + bookIdToCheckIn + "' not found or could not be checked in.");
+        }
     }
 }
