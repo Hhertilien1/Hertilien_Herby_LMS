@@ -27,7 +27,7 @@ public class LibraryManager {
             // Replace these with your MySQL database credentials and schema name
             String url = "jdbc:mysql://localhost:3306/LMS_db";
             String user = "root";
-            String password = "Herby123";
+            String password = "Herby!123";
 
             // Initialize database connection
             connection = DriverManager.getConnection(url, user, password);

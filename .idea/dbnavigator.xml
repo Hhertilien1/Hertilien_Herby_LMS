@@ -9,6 +9,12 @@
     <value-preview-text-wrapping value="true" />
     <value-preview-pinned value="false" />
   </component>
+  <component name="DBNavigator.Project.DatabaseBrowserManager">
+    <autoscroll-to-editor value="false" />
+    <autoscroll-from-editor value="true" />
+    <show-object-properties value="true" />
+    <loaded-nodes />
+  </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="be6a0d38-11a8-4f0b-ab2e-b0477836a056">
       <console name="LMS" type="STANDARD" schema="" session="Main" />
@@ -35,10 +41,10 @@
           <description value="" />
           <database-type value="MYSQL" />
           <config-type value="BASIC" />
-          <database-version value="9999.0" />
-          <driver-source value="BUNDLED" />
-          <driver-library value="" />
-          <driver value="" />
+          <database-version value="8.4" />
+          <driver-source value="EXTERNAL" />
+          <driver-library value="C:\Users\Herby\OneDrive\Desktop\mysql-connector-j-8.3.0.jar" />
+          <driver value="com.mysql.cj.jdbc.Driver" />
           <url-type value="DATABASE" />
           <host value="localhost" />
           <port value="3306" />

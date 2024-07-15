@@ -41,8 +41,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="java" level="project" />
-    <orderEntry type="module-library">
+    <orderEntry type="library" exported="" name="java" level="project" />
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES />
         <JAVADOC />
@@ -60,7 +60,7 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
           <root url="jar://$USER_HOME$/OneDrive/Desktop/VC/JAVA.zip!/jdbc/out/production/jdbc" />
@@ -77,6 +77,17 @@
         <JAVADOC />
         <SOURCES />
         <jarDirectory url="file://C:/Program Files/MySQL" recursive="false" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/src" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
