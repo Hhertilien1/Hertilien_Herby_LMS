@@ -16,10 +16,13 @@ import java.util.Random;
 public class Book {
     private int barcode;
     private String title;
-    private int bookId;
+    private int id;
     private String author;
     private boolean isAvailable;
     private LocalDate dueDate;
+
+    public Book(int id, int barcode, String title, String author, String dueDate) {
+    }
 
     // Method to generate a random 3-digit barcode
     private int generateRandomBarcode() {
@@ -34,7 +37,7 @@ public class Book {
         this.author = author;
         this.isAvailable = true; // Newly added books are available by default
         this.dueDate = null; // Due date initially set to null
-        this.bookId = generateBookId(); // Generate a book ID
+        this.id = generateBookId(); // Generate a book ID
     }
 
 

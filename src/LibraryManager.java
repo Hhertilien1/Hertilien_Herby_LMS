@@ -13,22 +13,31 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 public class LibraryManager {
-    private List<Book> books;
+    private Connection connection;
 
-    // Constructor
+    // Constructor: Establishes database connection
     public LibraryManager() {
-        books = new ArrayList<>();
-        Random random = new Random();
+        try {
+            // Replace these with your MySQL database credentials and schema name
+            String url = "jdbc:mysql://localhost:3306/LMS_db";
+            String user = "root";
+            String password = "Herby123";
+
+            // Initialize database connection
+            connection = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected to the database.");
+        } catch (SQLException e) {
+            System.out.println("Error connecting to the database: " + e.getMessage());
+        }
     }
 
-    // Method to add books from a file
+    // Method to add books from a file to the database
     public boolean addBookFromFile(String filePath) {
         boolean addedAtLeastOneBook = false;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -38,8 +47,7 @@ public class LibraryManager {
                 if (bookInfo.length >= 2) {
                     String title = bookInfo[0].trim();
                     String author = bookInfo[1].trim();
-                    Book book = new Book(title, author);
-                    books.add(book);
+                    addBook(title, author); // Add book to database
                     addedAtLeastOneBook = true;
                 }
             }
@@ -49,143 +57,211 @@ public class LibraryManager {
         return addedAtLeastOneBook;
     }
 
-    // Method to remove a book by its barcode
+    // Method to add a book to the database
+    private void addBook(String title, String author) {
+        String sql = "INSERT INTO books (title, author, available, due_date) VALUES (?, ?, true, null)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, title);
+            statement.setString(2, author);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error adding book: " + e.getMessage());
+        }
+    }
+
+    // Method to remove a book by its barcode from the database
     public boolean removeBookByBarcode(int barcode) {
-        Iterator<Book> iterator = books.iterator();
-        while (iterator.hasNext()) {
-            Book book = iterator.next();
-            if (book.getBarcode() == barcode) {
-                iterator.remove();
-                return true;
-            }
+        String sql = "DELETE FROM books WHERE barcode = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, barcode);
+            int rowsDeleted = statement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            System.out.println("Error removing book: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    // Method to remove a book by its title
+    // Method to remove a book by its title from the database
     public boolean removeBookByTitle(String title) {
-        Iterator<Book> iterator = books.iterator();
-        while (iterator.hasNext()) {
-            Book book = iterator.next();
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                iterator.remove();
-                return true;
-            }
+        String sql = "DELETE FROM books WHERE title = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, title);
+            int rowsDeleted = statement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            System.out.println("Error removing book: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    // Method to remove a book by its ID
+    // Method to remove a book by its ID from the database
     public boolean removeBookById(int bookId) {
-        Iterator<Book> iterator = books.iterator();
-        while (iterator.hasNext()) {
-            Book book = iterator.next();
-            if (book.getBookId() == bookId) {
-                iterator.remove();
-                return true;
-            }
+        String sql = "DELETE FROM books WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, bookId);
+            int rowsDeleted = statement.executeUpdate();
+            return rowsDeleted > 0;
+        } catch (SQLException e) {
+            System.out.println("Error removing book: " + e.getMessage());
+            return false;
         }
-        return false;
-    }
-
-    // Method to check out a book by its title
-    public boolean checkOutBookByTitle(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                if (book.isAvailable()) {
-                    book.setAvailable(false);
-                    book.setDueDate(LocalDate.now().plusDays(14)); // Example: Due date set to 14 days from now
-                    return true;
-                } else {
-                    return false; // Book is already checked out
-                }
-            }
-        }
-        return false; // Book not found
-    }
-
-    // Method to check out a book by its ID
-    public boolean checkOutBookById(int bookId) {
-        for (Book book : books) {
-            if (book.getBookId() == bookId) {
-                if (book.isAvailable()) {
-                    book.setAvailable(false);
-                    book.setDueDate(LocalDate.now().plusDays(14)); // Example: Due date set to 14 days from now
-                    return true;
-                } else {
-                    return false; // Book is already checked out
-                }
-            }
-        }
-        return false; // Book not found
     }
 
     // Method to check out a book by its barcode
     public boolean checkOutBookByBarcode(int barcode) {
-        for (Book book : books) {
-            if (book.getBarcode() == barcode) {
-                if (book.isAvailable()) {
-                    book.setAvailable(false);
-                    book.setDueDate(LocalDate.now().plusDays(14)); // Example: Due date set to 14 days from now
-                    return true;
-                } else {
-                    return false; // Book is already checked out
-                }
-            }
-        }
-        return false; // Book not found
+        return updateBookAvailability(barcode, false);
     }
 
-    // Method to check in a book by its title
-    public boolean checkInBookByTitle(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                if (!book.isAvailable()) {
-                    book.setAvailable(true);
-                    book.setDueDate(null); // Clear due date upon check-in
-                    return true;
-                } else {
-                    return false; // Book is already available
-                }
-            }
-        }
-        return false; // Book not found
-    }
-
-    // Method to check in a book by its ID
-    public boolean checkInBookById(int bookId) {
-        for (Book book : books) {
-            if (book.getBookId() == bookId) {
-                if (!book.isAvailable()) {
-                    book.setAvailable(true);
-                    book.setDueDate(null); // Clear due date upon check-in
-                    return true;
-                } else {
-                    return false; // Book is already available
-                }
-            }
-        }
-        return false; // Book not found
+    // Method to check out a book by its ID
+    public boolean checkOutBookById(int bookId) {
+        return updateBookAvailabilityById(bookId, false);
     }
 
     // Method to check in a book by its barcode
     public boolean checkInBookByBarcode(int barcode) {
-        for (Book book : books) {
-            if (book.getBarcode() == barcode) {
-                if (!book.isAvailable()) {
-                    book.setAvailable(true);
-                    book.setDueDate(null); // Clear due date upon check-in
-                    return true;
-                } else {
-                    return false; // Book is already available
-                }
-            }
-        }
-        return false; // Book not found
+        return updateBookAvailability(barcode, true);
     }
 
-    // Method to list all books in the library
+    // Method to check in a book by its ID
+    public boolean checkInBookById(int bookId) {
+        return updateBookAvailabilityById(bookId, true);
+    }
+
+    // Method to update book availability by barcode
+    private boolean updateBookAvailability(int barcode, boolean available) {
+        String sql = "UPDATE books SET available = ? WHERE barcode = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, available);
+            statement.setInt(2, barcode);
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating book availability: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Method to update book availability by ID
+    private boolean updateBookAvailabilityById(int bookId, boolean available) {
+        String sql = "UPDATE books SET available = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, available);
+            statement.setInt(2, bookId);
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            System.out.println("Error updating book availability: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Method to list all books from the database
     public List<Book> listAllBooks() {
+        List<Book> books = new ArrayList<>();
+        String sql = "SELECT * FROM books";
+        try (Statement statement = connection.createStatement()) {
+            try (ResultSet resultSet = statement.executeQuery(sql)) {
+
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    int barcode = resultSet.getInt("barcode");
+                    String title = resultSet.getString("title");
+                    String author = resultSet.getString("author");
+                    String dueDate = resultSet.getString("due_date");
+                    books.add(new Book(id, barcode, title, author, dueDate));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving books: " + e.getMessage());
+        }
         return books;
     }
+
+    // Method to close the database connection
+    public void closeConnection() {
+        try {
+            if (connection != null) {
+                connection.close();
+                System.out.println("Database connection closed.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error closing database connection: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        // Example usage:
+        LibraryManager libraryManager = new LibraryManager();
+
+        // Add books from a file (example file path)
+        libraryManager.addBookFromFile("C:/path/to/your/books.txt");
+
+        // List all books
+        List<Book> allBooks = libraryManager.listAllBooks();
+        System.out.println("All Books:");
+        for (Book book : allBooks) {
+            System.out.println(book);
+        }
+
+        // Check out a book by barcode
+        int barcodeToCheckOut = 12345;
+        if (libraryManager.checkOutBookByBarcode(barcodeToCheckOut)) {
+            System.out.println("Book with barcode " + barcodeToCheckOut + " checked out successfully.");
+        } else {
+            System.out.println("Failed to check out book with barcode " + barcodeToCheckOut + ".");
+        }
+
+        // Check in a book by ID
+        int bookIdToCheckIn = 1;
+        if (libraryManager.checkInBookById(bookIdToCheckIn)) {
+            System.out.println("Book with ID " + bookIdToCheckIn + " checked in successfully.");
+        } else {
+            System.out.println("Failed to check in book with ID " + bookIdToCheckIn + ".");
+        }
+
+        // Remove a book by title
+        String titleToRemove = "Book Title";
+        if (libraryManager.removeBookByTitle(titleToRemove)) {
+            System.out.println("Book with title '" + titleToRemove + "' removed successfully.");
+        } else {
+            System.out.println("Failed to remove book with title '" + titleToRemove + "'.");
+        }
+
+        // Close the connection when done
+        libraryManager.closeConnection();
+    }
+
+    // Method to check out a book by its title
+    public boolean checkOutBookByTitle(String title) {
+        String sql = "UPDATE books SET available = ?, due_date = ? WHERE title = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, false); // Set available to false (checked out)
+            statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(14))); // Example: Due date 14 days from now
+            statement.setString(3, title);
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            System.out.println("Error checking out book: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // Method to check in a book by its title
+    public boolean checkInBookByTitle(String title) {
+        String sql = "UPDATE books SET available = ?, due_date = ? WHERE title = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, true); // Set available to true (checked in)
+            statement.setNull(2, Types.DATE); // Clear due date
+            statement.setString(3, title);
+            int rowsUpdated = statement.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            System.out.println("Error checking in book: " + e.getMessage());
+            return false;
+        }
+    }
+
+
 }
+

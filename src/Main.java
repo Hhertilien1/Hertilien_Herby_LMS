@@ -19,6 +19,9 @@ public class Main {
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
+
+
+
         boolean exit = false;
         while (!exit) {
             printMenu();
@@ -69,6 +72,7 @@ public class Main {
         }
         scanner.close();
     }
+
 
     private static void printMenu() {
         System.out.println("\nMenu:");
