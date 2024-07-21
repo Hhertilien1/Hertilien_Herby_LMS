@@ -1,8 +1,4 @@
-/**
- * Manages a collection of Book objects and interacts with a database to perform various operations.
- * Provides methods to add, remove, and list books, as well as check in and check out books.
- * Handles database operations related to the library's book collection and manages book availability.
- */
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -10,7 +6,11 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Manages a collection of Book objects and interacts with a database to perform various operations.
+ * Provides methods to add, remove, and list books, as well as check in and check out books.
+ * Handles database operations related to the library's book collection and manages book availability.
+ */
 public class LibraryManager {
     private Connection connection;
 

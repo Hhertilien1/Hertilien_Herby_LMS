@@ -1,13 +1,10 @@
 import java.util.List;
 
 /**
- * A test class for the {@link LibraryManager} class.
- * <p>
- * This class demonstrates how to use the {@link LibraryManager} to perform various operations such as
- * adding books from a file, listing all books, removing books by title, checking out books by barcode,
- * and checking in books by ID.
- * </p>
+ * Tests the functionality of the LibraryManager class.
+ * This class includes test cases for various methods in LibraryManager.
  */
+
 public class LibraryManagerTest {
 
     /**

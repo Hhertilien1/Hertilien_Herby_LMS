@@ -1,19 +1,10 @@
-/**
- * Herby Heertlien
- * CEN 3024C-33022
- * Prof. Walauskis
- * 5/19/24
- * Software Development One
- */
 
-/**
- * Represents a single book with an ID, title, and author.
- * Each Book object encapsulates the details of one book.
- * Serves as a data model to store and manage book information within the library system.
- */
 import java.time.LocalDate;
 import java.util.Random;
-
+/**
+ * Represents a book in the library.
+ * This class contains details such as title, author, ID, and barcode.
+ */
 public class Book {
     private static int bookCounter = 1; // Static variable to ensure unique and incremental IDs
     private int barcode;
