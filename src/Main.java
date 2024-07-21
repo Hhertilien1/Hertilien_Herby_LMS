@@ -1,23 +1,29 @@
-/*Herby Heertlien
+/**
+ * Herby Heertlien
  * CEN 3024C-33022
  * Prof. Walauskis
  * 5/19/24
- * Softwarre Development One
+ * Software Development One
  *
- *Main Class: Provides the user interface for interacting with the library management system.
+ * Main Class: Provides the user interface for interacting with the library management system.
  * It includes a menu for adding books from a file, removing books, listing all books, and exiting the program.
+ *
  * Relation to Overall Program: Acts as the entry point of the program.
  * It initializes the LibraryManager and uses it to perform operations based on user input.
  * This class orchestrates the flow of the program by responding to user commands and invoking appropriate methods in the LibraryManager.
  */
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
-
 
 public class Main {
     private static LibraryManager libraryManager = new LibraryManager();
     private static Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Main method that starts the program and provides a menu for user interaction.
+     * @param args command-line arguments (not used).
+     */
     public static void main(String[] args) {
         boolean exit = false;
         while (!exit) {
@@ -69,6 +75,10 @@ public class Main {
         scanner.close();
     }
 
+    /**
+     * Prints the menu options for the user.
+     * Provides a list of actions the user can choose to perform on the library system.
+     */
     private static void printMenu() {
         System.out.println("\nMenu:");
         System.out.println("1. Add books from file");
@@ -86,6 +96,10 @@ public class Main {
         System.out.print("Enter your choice: ");
     }
 
+    /**
+     * Gets the user's choice from the menu.
+     * @return the chosen menu option as an integer.
+     */
     private static int getUserChoice() {
         while (true) {
             try {
@@ -97,6 +111,10 @@ public class Main {
         }
     }
 
+    /**
+     * Adds books to the library from a specified file.
+     * Prompts the user for the file name and attempts to add books from that file.
+     */
     private static void addBookFromFile() {
         System.out.print("Enter the file name: ");
         String fileName = scanner.next();
@@ -107,6 +125,10 @@ public class Main {
         }
     }
 
+    /**
+     * Removes a book from the library by its ID.
+     * Prompts the user for the book ID and attempts to remove the book with that ID.
+     */
     private static void removeBookById() {
         System.out.print("Enter the book ID to remove: ");
         int bookId = getValidInteger();
@@ -117,6 +139,10 @@ public class Main {
         }
     }
 
+    /**
+     * Removes a book from the library by its barcode.
+     * Prompts the user for the book barcode and attempts to remove the book with that barcode.
+     */
     private static void removeBookByBarcode() {
         System.out.print("Enter the book barcode to remove: ");
         int barcode = getValidInteger();
@@ -127,6 +153,10 @@ public class Main {
         }
     }
 
+    /**
+     * Removes a book from the library by its title.
+     * Prompts the user for the book title and attempts to remove the book with that title.
+     */
     private static void removeBookByTitle() {
         System.out.print("Enter the book title to remove: ");
         String title = scanner.next();
@@ -137,6 +167,10 @@ public class Main {
         }
     }
 
+    /**
+     * Checks out a book from the library by its ID.
+     * Prompts the user for the book ID and attempts to check out the book with that ID.
+     */
     private static void checkOutBookById() {
         System.out.print("Enter the book ID to check out: ");
         int bookId = getValidInteger();
@@ -147,6 +181,10 @@ public class Main {
         }
     }
 
+    /**
+     * Checks out a book from the library by its barcode.
+     * Prompts the user for the book barcode and attempts to check out the book with that barcode.
+     */
     private static void checkOutBookByBarcode() {
         System.out.print("Enter the book barcode to check out: ");
         int barcode = getValidInteger();
@@ -157,6 +195,10 @@ public class Main {
         }
     }
 
+    /**
+     * Checks out a book from the library by its title.
+     * Prompts the user for the book title and attempts to check out the book with that title.
+     */
     private static void checkOutBookByTitle() {
         System.out.print("Enter the book title to check out: ");
         String title = scanner.next();
@@ -167,6 +209,10 @@ public class Main {
         }
     }
 
+    /**
+     * Checks in a book to the library by its ID.
+     * Prompts the user for the book ID and attempts to check in the book with that ID.
+     */
     private static void checkInBookById() {
         System.out.print("Enter the book ID to check in: ");
         int bookId = getValidInteger();
@@ -177,6 +223,10 @@ public class Main {
         }
     }
 
+    /**
+     * Checks in a book to the library by its barcode.
+     * Prompts the user for the book barcode and attempts to check in the book with that barcode.
+     */
     private static void checkInBookByBarcode() {
         System.out.print("Enter the book barcode to check in: ");
         int barcode = getValidInteger();
@@ -187,6 +237,10 @@ public class Main {
         }
     }
 
+    /**
+     * Checks in a book to the library by its title.
+     * Prompts the user for the book title and attempts to check in the book with that title.
+     */
     private static void checkInBookByTitle() {
         System.out.print("Enter the book title to check in: ");
         String title = scanner.next();
@@ -197,6 +251,10 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all books currently in the library.
+     * Displays a list of all books and their details. If no books are available, notifies the user.
+     */
     private static void listAllBooks() {
         System.out.println("Listing all books:");
         var books = libraryManager.listAllBooks();
@@ -209,6 +267,11 @@ public class Main {
         }
     }
 
+    /**
+     * Gets a valid integer input from the user.
+     * Continuously prompts the user until a valid integer is entered.
+     * @return the valid integer entered by the user.
+     */
     private static int getValidInteger() {
         while (true) {
             try {

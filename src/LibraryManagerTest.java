@@ -1,14 +1,38 @@
-
 import java.util.List;
 
+/**
+ * A test class for the {@link LibraryManager} class.
+ * <p>
+ * This class demonstrates how to use the {@link LibraryManager} to perform various operations such as
+ * adding books from a file, listing all books, removing books by title, checking out books by barcode,
+ * and checking in books by ID.
+ * </p>
+ */
 public class LibraryManagerTest {
 
+    /**
+     * The main method that runs the test operations on the {@link LibraryManager}.
+     * <p>
+     * This method performs the following tasks:
+     * <ul>
+     *     <li>Adds books from a specified file.</li>
+     *     <li>Lists all books in the library.</li>
+     *     <li>Removes a book by its title.</li>
+     *     <li>Checks out a book by its barcode.</li>
+     *     <li>Checks in a book by its ID.</li>
+     * </ul>
+     * </p>
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         LibraryManager libraryManager = new LibraryManager();
 
-        // Add books from file
+        // Path to the file containing book data
         String filePath = "C:\\Users\\Herby\\OneDrive\\Desktop\\books.txt";
+
         try {
+            // Add books from file
             boolean booksAdded = libraryManager.addBookFromFile(filePath);
             if (booksAdded) {
                 System.out.println("Books added successfully from file.");

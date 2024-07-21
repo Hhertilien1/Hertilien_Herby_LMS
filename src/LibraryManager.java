@@ -1,15 +1,8 @@
-/*Herby Heertlien
- * CEN 3024C-33022
- * Prof. Walauskis
- * 5/19/24
- * Softwarre Development One
- *
- * LibraryManager Class:Manages a collection of Book objects.
- * Provides methods to add books from a file, remove books by ID, and list all books.
- * Relation to Overall Program: Acts as the main component for managing the library's book collection.
- * It handles operations related to maintaining the list of books, ensuring no duplicate IDs, and interacting with external data sources (files).
+/**
+ * Manages a collection of Book objects and interacts with a database to perform various operations.
+ * Provides methods to add, remove, and list books, as well as check in and check out books.
+ * Handles database operations related to the library's book collection and manages book availability.
  */
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,7 +14,10 @@ import java.util.List;
 public class LibraryManager {
     private Connection connection;
 
-    // Constructor: Establishes database connection
+    /**
+     * Constructs a LibraryManager and establishes a connection to the database.
+     * Initializes the database connection using the specified URL, user, and password.
+     */
     public LibraryManager() {
         try {
             // Replace these with your MySQL database credentials and schema name
@@ -37,7 +33,12 @@ public class LibraryManager {
         }
     }
 
-    // Method to add books from a file to the database
+    /**
+     * Adds books to the database from a specified file.
+     * The file should contain book information in the format: title, author.
+     * @param filePath the path to the file containing book information.
+     * @return true if at least one book was added, false otherwise.
+     */
     public boolean addBookFromFile(String filePath) {
         boolean addedAtLeastOneBook = false;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -57,7 +58,11 @@ public class LibraryManager {
         return addedAtLeastOneBook;
     }
 
-    // Method to add a book to the database
+    /**
+     * Adds a single book to the database.
+     * @param title the title of the book.
+     * @param author the author of the book.
+     */
     private void addBook(String title, String author) {
         String sql = "INSERT INTO books (title, author, available, due_date) VALUES (?, ?, true, null)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -69,7 +74,11 @@ public class LibraryManager {
         }
     }
 
-    // Method to remove a book by its barcode from the database
+    /**
+     * Removes a book from the database by its barcode.
+     * @param barcode the barcode of the book to be removed.
+     * @return true if the book was removed, false otherwise.
+     */
     public boolean removeBookByBarcode(int barcode) {
         String sql = "DELETE FROM books WHERE barcode = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -82,7 +91,11 @@ public class LibraryManager {
         }
     }
 
-    // Method to remove a book by its title from the database
+    /**
+     * Removes a book from the database by its title.
+     * @param title the title of the book to be removed.
+     * @return true if the book was removed, false otherwise.
+     */
     public boolean removeBookByTitle(String title) {
         String sql = "DELETE FROM books WHERE title = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -95,7 +108,11 @@ public class LibraryManager {
         }
     }
 
-    // Method to remove a book by its ID from the database
+    /**
+     * Removes a book from the database by its ID.
+     * @param bookId the ID of the book to be removed.
+     * @return true if the book was removed, false otherwise.
+     */
     public boolean removeBookById(int bookId) {
         String sql = "DELETE FROM books WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -108,27 +125,52 @@ public class LibraryManager {
         }
     }
 
-    // Method to check out a book by its barcode
+    /**
+     * Checks out a book from the library by its barcode.
+     * Updates the book's availability to false and sets the due date.
+     * @param barcode the barcode of the book to be checked out.
+     * @return true if the book was checked out successfully, false otherwise.
+     */
     public boolean checkOutBookByBarcode(int barcode) {
         return updateBookAvailability(barcode, false);
     }
 
-    // Method to check out a book by its ID
+    /**
+     * Checks out a book from the library by its ID.
+     * Updates the book's availability to false and sets the due date.
+     * @param bookId the ID of the book to be checked out.
+     * @return true if the book was checked out successfully, false otherwise.
+     */
     public boolean checkOutBookById(int bookId) {
         return updateBookAvailabilityById(bookId, false);
     }
 
-    // Method to check in a book by its barcode
+    /**
+     * Checks in a book to the library by its barcode.
+     * Updates the book's availability to true and clears the due date.
+     * @param barcode the barcode of the book to be checked in.
+     * @return true if the book was checked in successfully, false otherwise.
+     */
     public boolean checkInBookByBarcode(int barcode) {
         return updateBookAvailability(barcode, true);
     }
 
-    // Method to check in a book by its ID
+    /**
+     * Checks in a book to the library by its ID.
+     * Updates the book's availability to true and clears the due date.
+     * @param bookId the ID of the book to be checked in.
+     * @return true if the book was checked in successfully, false otherwise.
+     */
     public boolean checkInBookById(int bookId) {
         return updateBookAvailabilityById(bookId, true);
     }
 
-    // Method to update book availability by barcode
+    /**
+     * Updates the availability status and due date of a book by its barcode.
+     * @param barcode the barcode of the book to be updated.
+     * @param available the new availability status of the book (true for available, false for checked out).
+     * @return true if the book's availability was updated successfully, false otherwise.
+     */
     private boolean updateBookAvailability(int barcode, boolean available) {
         String sql = "UPDATE books SET available = ?, due_date = ? WHERE barcode = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -147,7 +189,12 @@ public class LibraryManager {
         }
     }
 
-    // Method to update book availability by ID
+    /**
+     * Updates the availability status and due date of a book by its ID.
+     * @param bookId the ID of the book to be updated.
+     * @param available the new availability status of the book (true for available, false for checked out).
+     * @return true if the book's availability was updated successfully, false otherwise.
+     */
     private boolean updateBookAvailabilityById(int bookId, boolean available) {
         String sql = "UPDATE books SET available = ?, due_date = ? WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -166,7 +213,10 @@ public class LibraryManager {
         }
     }
 
-    // Method to list all books from the database
+    /**
+     * Lists all books currently in the library database.
+     * @return a list of all books, each represented by a Book object.
+     */
     public List<Book> listAllBooks() {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM books";
@@ -188,7 +238,10 @@ public class LibraryManager {
         return books;
     }
 
-    // Method to close the database connection
+    /**
+     * Closes the database connection.
+     * Ensures the connection is properly closed if it is open.
+     */
     public void closeConnection() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -200,59 +253,32 @@ public class LibraryManager {
         }
     }
 
-    public static void main(String[] args) {
-        // Example usage:
-        LibraryManager libraryManager = new LibraryManager();
-
-        // Add books from a file (example file path)
-        libraryManager.addBookFromFile("C:/path/to/your/books.txt");
-
-        // List all books
-        List<Book> allBooks = libraryManager.listAllBooks();
-        System.out.println("All Books:");
-        for (Book book : allBooks) {
-            System.out.println(book);
-        }
-
-        // Check out a book by barcode
-        int barcodeToCheckOut = 123; // Replace with a valid barcode
-        if (libraryManager.checkOutBookByBarcode(barcodeToCheckOut)) {
-            System.out.println("Book with barcode " + barcodeToCheckOut + " checked out successfully.");
-        } else {
-            System.out.println("Failed to check out book with barcode " + barcodeToCheckOut + ".");
-        }
-
-        // Check in a book by ID
-        int bookIdToCheckIn = 1; // Replace with a valid book ID
-        if (libraryManager.checkInBookById(bookIdToCheckIn)) {
-            System.out.println("Book with ID " + bookIdToCheckIn + " checked in successfully.");
-        } else {
-            System.out.println("Failed to check in book with ID " + bookIdToCheckIn + ".");
-        }
-
-        // Remove a book by title
-        String titleToRemove = "Book Title"; // Replace with a valid book title
-        if (libraryManager.removeBookByTitle(titleToRemove)) {
-            System.out.println("Book with title '" + titleToRemove + "' removed successfully.");
-        } else {
-            System.out.println("Failed to remove book with title '" + titleToRemove + "'.");
-        }
-
-        // Close the connection when done
-        libraryManager.closeConnection();
-    }
-
-    // Method to check out a book by its title
+    /**
+     * Checks out a book from the library by its title.
+     * Updates the book's availability to false and sets the due date.
+     * @param title the title of the book to be checked out.
+     * @return true if the book was checked out successfully, false otherwise.
+     */
     public boolean checkOutBookByTitle(String title) {
         return updateBookAvailabilityByTitle(title, false);
     }
 
-    // Method to check in a book by its title
+    /**
+     * Checks in a book to the library by its title.
+     * Updates the book's availability to true and clears the due date.
+     * @param title the title of the book to be checked in.
+     * @return true if the book was checked in successfully, false otherwise.
+     */
     public boolean checkInBookByTitle(String title) {
         return updateBookAvailabilityByTitle(title, true);
     }
 
-    // Helper method to update book availability by title
+    /**
+     * Updates the availability status and due date of a book by its title.
+     * @param title the title of the book to be updated.
+     * @param available the new availability status of the book (true for available, false for checked out).
+     * @return true if the book's availability was updated successfully, false otherwise.
+     */
     private boolean updateBookAvailabilityByTitle(String title, boolean available) {
         String sql = "UPDATE books SET available = ?, due_date = ? WHERE title = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
