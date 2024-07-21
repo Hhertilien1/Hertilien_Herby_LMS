@@ -25,7 +25,7 @@ public class LibraryManager {
     public LibraryManager() {
         try {
             // Replace these with your MySQL database credentials and schema name
-            String url = "jdbc:mysql://localhost:3306/LMS_db";
+            String url = "jdbc:mysql://127.0.0.1:3306/LMS_db";
             String user = "root";
             String password = "Herby!123";
 
@@ -33,7 +33,7 @@ public class LibraryManager {
             connection = DriverManager.getConnection(url, user, password);
             System.out.println("Connected to the database.");
         } catch (SQLException e) {
-            System.out.println("Error connecting to the database: " + e.getMessage());
+            System.err.println("Error connecting to the database: " + e.getMessage());
         }
     }
 
@@ -65,7 +65,7 @@ public class LibraryManager {
             statement.setString(2, author);
             statement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error adding book: " + e.getMessage());
+            System.err.println("Error adding book: " + e.getMessage());
         }
     }
 
@@ -77,7 +77,7 @@ public class LibraryManager {
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
         } catch (SQLException e) {
-            System.out.println("Error removing book: " + e.getMessage());
+            System.err.println("Error removing book: " + e.getMessage());
             return false;
         }
     }
@@ -90,7 +90,7 @@ public class LibraryManager {
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
         } catch (SQLException e) {
-            System.out.println("Error removing book: " + e.getMessage());
+            System.err.println("Error removing book: " + e.getMessage());
             return false;
         }
     }
@@ -103,7 +103,7 @@ public class LibraryManager {
             int rowsDeleted = statement.executeUpdate();
             return rowsDeleted > 0;
         } catch (SQLException e) {
-            System.out.println("Error removing book: " + e.getMessage());
+            System.err.println("Error removing book: " + e.getMessage());
             return false;
         }
     }
@@ -130,28 +130,38 @@ public class LibraryManager {
 
     // Method to update book availability by barcode
     private boolean updateBookAvailability(int barcode, boolean available) {
-        String sql = "UPDATE books SET available = ? WHERE barcode = ?";
+        String sql = "UPDATE books SET available = ?, due_date = ? WHERE barcode = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, available);
-            statement.setInt(2, barcode);
+            if (available) {
+                statement.setNull(2, Types.DATE); // Clear due date if available
+            } else {
+                statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(14))); // Example: Due date 14 days from now
+            }
+            statement.setInt(3, barcode);
             int rowsUpdated = statement.executeUpdate();
             return rowsUpdated > 0;
         } catch (SQLException e) {
-            System.out.println("Error updating book availability: " + e.getMessage());
+            System.err.println("Error updating book availability: " + e.getMessage());
             return false;
         }
     }
 
     // Method to update book availability by ID
     private boolean updateBookAvailabilityById(int bookId, boolean available) {
-        String sql = "UPDATE books SET available = ? WHERE id = ?";
+        String sql = "UPDATE books SET available = ?, due_date = ? WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, available);
-            statement.setInt(2, bookId);
+            if (available) {
+                statement.setNull(2, Types.DATE); // Clear due date if available
+            } else {
+                statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(14))); // Example: Due date 14 days from now
+            }
+            statement.setInt(3, bookId);
             int rowsUpdated = statement.executeUpdate();
             return rowsUpdated > 0;
         } catch (SQLException e) {
-            System.out.println("Error updating book availability: " + e.getMessage());
+            System.err.println("Error updating book availability: " + e.getMessage());
             return false;
         }
     }
@@ -160,20 +170,20 @@ public class LibraryManager {
     public List<Book> listAllBooks() {
         List<Book> books = new ArrayList<>();
         String sql = "SELECT * FROM books";
-        try (Statement statement = connection.createStatement()) {
-            try (ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
 
-                while (resultSet.next()) {
-                    int id = resultSet.getInt("id");
-                    int barcode = resultSet.getInt("barcode");
-                    String title = resultSet.getString("title");
-                    String author = resultSet.getString("author");
-                    String dueDate = resultSet.getString("due_date");
-                    books.add(new Book(id, barcode, title, author, dueDate));
-                }
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                int barcode = resultSet.getInt("barcode");
+                String title = resultSet.getString("title");
+                String author = resultSet.getString("author");
+                Date dueDate = resultSet.getDate("due_date");
+                LocalDate localDueDate = (dueDate != null) ? dueDate.toLocalDate() : null;
+                books.add(new Book(id, barcode, title, author, localDueDate));
             }
         } catch (SQLException e) {
-            System.out.println("Error retrieving books: " + e.getMessage());
+            System.err.println("Error retrieving books: " + e.getMessage());
         }
         return books;
     }
@@ -181,12 +191,12 @@ public class LibraryManager {
     // Method to close the database connection
     public void closeConnection() {
         try {
-            if (connection != null) {
+            if (connection != null && !connection.isClosed()) {
                 connection.close();
                 System.out.println("Database connection closed.");
             }
         } catch (SQLException e) {
-            System.out.println("Error closing database connection: " + e.getMessage());
+            System.err.println("Error closing database connection: " + e.getMessage());
         }
     }
 
@@ -205,7 +215,7 @@ public class LibraryManager {
         }
 
         // Check out a book by barcode
-        int barcodeToCheckOut = 12345;
+        int barcodeToCheckOut = 123; // Replace with a valid barcode
         if (libraryManager.checkOutBookByBarcode(barcodeToCheckOut)) {
             System.out.println("Book with barcode " + barcodeToCheckOut + " checked out successfully.");
         } else {
@@ -213,7 +223,7 @@ public class LibraryManager {
         }
 
         // Check in a book by ID
-        int bookIdToCheckIn = 1;
+        int bookIdToCheckIn = 1; // Replace with a valid book ID
         if (libraryManager.checkInBookById(bookIdToCheckIn)) {
             System.out.println("Book with ID " + bookIdToCheckIn + " checked in successfully.");
         } else {
@@ -221,7 +231,7 @@ public class LibraryManager {
         }
 
         // Remove a book by title
-        String titleToRemove = "Book Title";
+        String titleToRemove = "Book Title"; // Replace with a valid book title
         if (libraryManager.removeBookByTitle(titleToRemove)) {
             System.out.println("Book with title '" + titleToRemove + "' removed successfully.");
         } else {
@@ -234,34 +244,30 @@ public class LibraryManager {
 
     // Method to check out a book by its title
     public boolean checkOutBookByTitle(String title) {
-        String sql = "UPDATE books SET available = ?, due_date = ? WHERE title = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setBoolean(1, false); // Set available to false (checked out)
-            statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(14))); // Example: Due date 14 days from now
-            statement.setString(3, title);
-            int rowsUpdated = statement.executeUpdate();
-            return rowsUpdated > 0;
-        } catch (SQLException e) {
-            System.out.println("Error checking out book: " + e.getMessage());
-            return false;
-        }
+        return updateBookAvailabilityByTitle(title, false);
     }
 
     // Method to check in a book by its title
     public boolean checkInBookByTitle(String title) {
+        return updateBookAvailabilityByTitle(title, true);
+    }
+
+    // Helper method to update book availability by title
+    private boolean updateBookAvailabilityByTitle(String title, boolean available) {
         String sql = "UPDATE books SET available = ?, due_date = ? WHERE title = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setBoolean(1, true); // Set available to true (checked in)
-            statement.setNull(2, Types.DATE); // Clear due date
+            statement.setBoolean(1, available);
+            if (available) {
+                statement.setNull(2, Types.DATE); // Clear due date if available
+            } else {
+                statement.setDate(2, Date.valueOf(LocalDate.now().plusDays(14))); // Example: Due date 14 days from now
+            }
             statement.setString(3, title);
             int rowsUpdated = statement.executeUpdate();
             return rowsUpdated > 0;
         } catch (SQLException e) {
-            System.out.println("Error checking in book: " + e.getMessage());
+            System.err.println("Error updating book availability: " + e.getMessage());
             return false;
         }
     }
-
-
 }
-

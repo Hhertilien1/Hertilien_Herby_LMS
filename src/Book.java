@@ -9,11 +9,11 @@
  * Each Book object encapsulates the details of one book.
  */
 
-
 import java.time.LocalDate;
 import java.util.Random;
 
 public class Book {
+    private static int bookCounter = 1; // Static variable to ensure unique and incremental IDs
     private int barcode;
     private String title;
     private int id;
@@ -21,7 +21,14 @@ public class Book {
     private boolean isAvailable;
     private LocalDate dueDate;
 
-    public Book(int id, int barcode, String title, String author, String dueDate) {
+    // Constructor
+    public Book(int id, int barcode, String title, String author, LocalDate localDueDate) {
+        this.barcode = generateRandomBarcode(); // Auto-assign barcode
+        this.title = title;
+        this.author = author;
+        this.isAvailable = true; // Newly added books are available by default
+        this.dueDate = null; // Due date initially set to null
+        this.id = generateBookId(); // Generate a unique book ID
     }
 
     // Method to generate a random 3-digit barcode
@@ -30,24 +37,12 @@ public class Book {
         return random.nextInt(900) + 100; // Generates a random number between 100 and 999
     }
 
-    // Constructor
-    public Book(String title, String author) {
-        this.barcode = generateRandomBarcode(); // Auto-assign barcode
-        this.title = title;
-        this.author = author;
-        this.isAvailable = true; // Newly added books are available by default
-        this.dueDate = null; // Due date initially set to null
-        this.id = generateBookId(); // Generate a book ID
-    }
-
-
+    // Method to generate a unique book ID starting from 1
     private int generateBookId() {
-    Random random = new Random();
-    return random.nextInt(1000); // Generates a random number between 0 and 999
+        return bookCounter++;
     }
 
-
-// toString method to represent the book's details
+    // toString method to represent the book's details
     @Override
     public String toString() {
         String status = isAvailable ? "Available" : "Checked Out";
@@ -85,6 +80,6 @@ public class Book {
     }
 
     public int getBookId() {
-        return barcode;
+        return id;
     }
 }

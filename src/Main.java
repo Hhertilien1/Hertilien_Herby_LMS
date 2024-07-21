@@ -10,23 +10,19 @@
  * It initializes the LibraryManager and uses it to perform operations based on user input.
  * This class orchestrates the flow of the program by responding to user commands and invoking appropriate methods in the LibraryManager.
  */
-import java.time.LocalDate;
-
+import java.util.InputMismatchException;
 import java.util.Scanner;
+
 
 public class Main {
     private static LibraryManager libraryManager = new LibraryManager();
     private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-
-
-
         boolean exit = false;
         while (!exit) {
             printMenu();
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline character after nextInt()
+            int choice = getUserChoice();
 
             switch (choice) {
                 case 1:
@@ -73,7 +69,6 @@ public class Main {
         scanner.close();
     }
 
-
     private static void printMenu() {
         System.out.println("\nMenu:");
         System.out.println("1. Add books from file");
@@ -91,73 +86,137 @@ public class Main {
         System.out.print("Enter your choice: ");
     }
 
+    private static int getUserChoice() {
+        while (true) {
+            try {
+                return scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.next(); // Clear the invalid input
+            }
+        }
+    }
+
     private static void addBookFromFile() {
         System.out.print("Enter the file name: ");
-        String fileName = scanner.nextLine();
-        libraryManager.addBookFromFile(fileName);
+        String fileName = scanner.next();
+        if (libraryManager.addBookFromFile(fileName)) {
+            System.out.println("Books added successfully.");
+        } else {
+            System.out.println("No books were added.");
+        }
     }
 
     private static void removeBookById() {
         System.out.print("Enter the book ID to remove: ");
-        int bookId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        libraryManager.removeBookById(bookId);
+        int bookId = getValidInteger();
+        if (libraryManager.removeBookById(bookId)) {
+            System.out.println("Book with ID " + bookId + " removed successfully.");
+        } else {
+            System.out.println("Failed to remove book with ID " + bookId + ".");
+        }
     }
 
     private static void removeBookByBarcode() {
         System.out.print("Enter the book barcode to remove: ");
-        int barcode = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        libraryManager.removeBookByBarcode(barcode);
+        int barcode = getValidInteger();
+        if (libraryManager.removeBookByBarcode(barcode)) {
+            System.out.println("Book with barcode " + barcode + " removed successfully.");
+        } else {
+            System.out.println("Failed to remove book with barcode " + barcode + ".");
+        }
     }
 
     private static void removeBookByTitle() {
         System.out.print("Enter the book title to remove: ");
-        String title = scanner.nextLine();
-        libraryManager.removeBookByTitle(title);
+        String title = scanner.next();
+        if (libraryManager.removeBookByTitle(title)) {
+            System.out.println("Book with title '" + title + "' removed successfully.");
+        } else {
+            System.out.println("Failed to remove book with title '" + title + "'.");
+        }
     }
 
     private static void checkOutBookById() {
         System.out.print("Enter the book ID to check out: ");
-        int bookId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        libraryManager.checkOutBookById(bookId);
+        int bookId = getValidInteger();
+        if (libraryManager.checkOutBookById(bookId)) {
+            System.out.println("Book with ID " + bookId + " checked out successfully.");
+        } else {
+            System.out.println("Failed to check out book with ID " + bookId + ".");
+        }
     }
 
     private static void checkOutBookByBarcode() {
         System.out.print("Enter the book barcode to check out: ");
-        int barcode = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        libraryManager.checkOutBookByBarcode(barcode);
+        int barcode = getValidInteger();
+        if (libraryManager.checkOutBookByBarcode(barcode)) {
+            System.out.println("Book with barcode " + barcode + " checked out successfully.");
+        } else {
+            System.out.println("Failed to check out book with barcode " + barcode + ".");
+        }
     }
 
     private static void checkOutBookByTitle() {
         System.out.print("Enter the book title to check out: ");
-        String title = scanner.nextLine();
-        libraryManager.checkOutBookByTitle(title);
+        String title = scanner.next();
+        if (libraryManager.checkOutBookByTitle(title)) {
+            System.out.println("Book with title '" + title + "' checked out successfully.");
+        } else {
+            System.out.println("Failed to check out book with title '" + title + "'.");
+        }
     }
 
     private static void checkInBookById() {
         System.out.print("Enter the book ID to check in: ");
-        int bookId = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        libraryManager.checkInBookById(bookId);
+        int bookId = getValidInteger();
+        if (libraryManager.checkInBookById(bookId)) {
+            System.out.println("Book with ID " + bookId + " checked in successfully.");
+        } else {
+            System.out.println("Failed to check in book with ID " + bookId + ".");
+        }
     }
 
     private static void checkInBookByBarcode() {
         System.out.print("Enter the book barcode to check in: ");
-        int barcode = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        libraryManager.checkInBookByBarcode(barcode);
+        int barcode = getValidInteger();
+        if (libraryManager.checkInBookByBarcode(barcode)) {
+            System.out.println("Book with barcode " + barcode + " checked in successfully.");
+        } else {
+            System.out.println("Failed to check in book with barcode " + barcode + ".");
+        }
     }
 
     private static void checkInBookByTitle() {
         System.out.print("Enter the book title to check in: ");
-        String title = scanner.nextLine();
-        libraryManager.checkInBookByTitle(title);
+        String title = scanner.next();
+        if (libraryManager.checkInBookByTitle(title)) {
+            System.out.println("Book with title '" + title + "' checked in successfully.");
+        } else {
+            System.out.println("Failed to check in book with title '" + title + "'.");
+        }
     }
 
     private static void listAllBooks() {
-        libraryManager.listAllBooks();
+        System.out.println("Listing all books:");
+        var books = libraryManager.listAllBooks();
+        if (books.isEmpty()) {
+            System.out.println("No books available.");
+        } else {
+            for (var book : books) {
+                System.out.println(book);
+            }
+        }
+    }
+
+    private static int getValidInteger() {
+        while (true) {
+            try {
+                return scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.next(); // Clear the invalid input
+            }
+        }
     }
 }
